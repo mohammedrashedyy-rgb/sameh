@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سجل دفعات المعلمين</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Tahoma, Arial, sans-serif;
+    background: #f1f5f9;
+    margin: 0;
+    color: #1e293b;
+}
+
+header {
+    background: linear-gradient(135deg, #15324b, #087e8b);
+    color: white;
+    text-align: center;
+    padding: 25px 10px;
+    border-bottom: 5px solid #f4bd50;
+}
+
+header h1 {
+    margin: 0 0 10px;
+}
+
+header p {
+    margin: 0;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 25px auto;
+    padding: 15px;
+}
+
+.card {
+    background: white;
+    padding: 22px;
+    margin-bottom: 22px;
+    border-radius: 14px;
+    box-shadow: 0 4px 15px #0000000d;
+}
+
+h2 {
+    color: #15324b;
+    margin-top: 0;
+    border-right: 5px solid #f4bd50;
+    padding-right: 10px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 7px;
+    font-weight: bold;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 15px;
+}
+
+button {
+    padding: 11px 17px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.primary {
+    background: #087e8b;
+    color: white;
+}
+
+.secondary {
+    background: #e2e8f0;
+    color: #15324b;
+}
+
+.danger {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 7px 10px;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.stat {
+    background: #eaf5f7;
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.stat span {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.stat strong {
+    font-size: 23px;
+    color: #087e8b;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    min-width: 550px;
+}
+
+th, td {
+    border: 1px solid #dbe3ea;
+    padding: 12px;
+    text-align: center;
+}
+
+th {
+    background: #15324b;
+    color: white;
+}
+
+tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.total {
+    color: #087e8b;
+    font-weight: bold;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+}
+
+@media (max-width: 600px) {
+    .form-grid, .stats {
+        grid-template-columns: 1fr;
+    }
+
+    .card {
+        padding: 15px;
+    }
+}
+
+@media print {
+    body {
+        background: white;
+    }
+
+    header {
+        background: white !important;
+        color: black;
+        border-bottom: 2px solid black;
+    }
+
+    .no-print, footer {
+        display: none !important;
+    }
+
+    .container {
+        margin: 0;
+        padding: 0;
+    }
+
+    .card {
+        box-shadow: none;
+        border: none;
+        padding: 5px;
+    }
+
+    table {
+        min-width: 0;
+        font-size: 12px;
+    }
+
+    th {
+        background: #ddd !important;
+        color: black !important;
+        print-color-adjust: exact;
+    }
+
+    button {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>سجل دفعات المعلمين</h1>
+    <p>تسجيل الدفعات اليومية وحساب المستحقات وطباعة الكشوفات</p>
+</header>
+
+<div class="container">
+
+    <!-- إضافة معلم -->
+    <section class="card no-print">
+        <h2>إضافة معلم جديد</h2>
+
+        <div class="form-grid">
+            <div>
+                <label for="teacherName">اسم المعلم</label>
+                <input id="teacherName"
+                       type="text"
+                       placeholder="أدخل اسم المعلم">
+            </div>
+        </div>
+
+        <button class="primary" onclick="addTeacher()">
+            إضافة المعلم
+        </button>
+    </section>
+
+    <!-- تسجيل دفعة -->
+    <section class="card no-print">
+        <h2>تسجيل دفعة يومية</h2>
+
+        <div class="form-grid">
+
+            <div>
+                <label for="teacherSelect">اسم المعلم</label>
+                <select id="teacherSelect">
+                    <option value="">اختر المعلم</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="paymentDate">تاريخ الدفع</label>
+                <input type="date" id="paymentDate">
+            </div>
+
+            <div>
+                <label for="paymentAmount">قيمة الدفع</label>
+                <input type="number"
+                       id="paymentAmount"
+                       min="0.01"
+                       step="0.01"
+                       placeholder="أدخل المبلغ">
+            </div>
+
+            <div>
+                <label for="paymentNote">ملاحظات</label>
+                <input type="text"
+                       id="paymentNote"
+                       placeholder="ملاحظات اختيارية">
+            </div>
+
+        </div>
+
+        <button class="primary" onclick="addPayment()">
+            حفظ الدفعة
+        </button>
+
+        <button class="secondary" onclick="clearForm()">
+            مسح الحقول
+        </button>
+    </section>
+
+    <!-- البحث والتصفية -->
+    <section class="card no-print">
+        <h2>البحث عن دفعات المعلمين</h2>
+
+        <div class="form-grid">
+
+            <div>
+                <label for="filterTeacher">اسم المعلم</label>
+                <select id="filterTeacher" onchange="renderPayments()">
+                    <option value="">جميع المعلمين</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="dateFrom">من تاريخ</label>
+                <input type="date" id="dateFrom"
+                       onchange="renderPayments()">
+            </div>
+
+            <div>
+                <label for="dateTo">إلى تاريخ</label>
+                <input type="date" id="dateTo"
+                       onchange="renderPayments()">
+            </div>
+
+        </div>
+
+        <button class="primary" onclick="renderPayments()">
+            عرض النتائج
+        </button>
+
+        <button class="secondary" onclick="printTeacher()">
+            طباعة كشف المعلم
+        </button>
+
+        <button class="secondary" onclick="printAll()">
+            طباعة جميع الدفعات الظاهرة
+        </button>
+
+        <button class="secondary" onclick="resetFilters()">
+            عرض جميع الدفعات
+        </button>
+    </section>
+
+    <!-- ملخص الحسابات -->
+    <section class="card">
+
+        <h2>ملخص الدفعات</h2>
+
+        <div class="stats">
+
+            <div class="stat">
+                <span>مجموع الدفعات</span>
+                <strong id="totalAmount">0.00</strong>
+            </div>
+
+            <div class="stat">
+                <span>عدد عمليات الدفع</span>
+                <strong id="paymentCount">0</strong>
+            </div>
+
+            <div class="stat">
+                <span>عدد المعلمين</span>
+                <strong id="teacherCount">0</strong>
+            </div>
+
+        </div>
+
+        <div id="reportTitle"></div>
+
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>الرقم</th>
+                        <th>اسم المعلم</th>
+                        <th>التاريخ</th>
+                        <th>قيمة الدفع</th>
+                        <th>الملاحظات</th>
+                        <th class="no-print">حذف</th>
+                    </tr>
+                </thead>
+
+                <tbody id="paymentsTable"></tbody>
+
+                <tfoot>
+                    <tr>
+                        <th colspan="3">المجموع الكلي</th>
+                        <th id="grandTotal" class="total">0.00</th>
+                        <th colspan="2"></th>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </section>
+
+</div>
+
+<footer>
+    سجل دفعات المعلمين — إدارة وتنظيم الدفعات اليومية
+</footer>
+
+<script>
+let teachers = JSON.parse(
+    localStorage.getItem("teachers") || "[]"
+);
+
+let payments = JSON.parse(
+    localStorage.getItem("payments") || "[]"
+);
+
+const money = value =>
+    Number(value).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    });
+
+function saveData() {
+    localStorage.setItem(
+        "teachers",
+        JSON.stringify(teachers)
+    );
+
+    localStorage.setItem(
+        "payments",
+        JSON.stringify(payments)
+    );
+}
+
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
+
+function makeId() {
+    return Date.now().toString(36) +
+        Math.random().toString(36).slice(2);
+}
+
+// إضافة معلم جديد
+function addTeacher() {
+    const input = document.getElementById("teacherName");
+    const name = input.value.trim();
+
+    if (!name) {
+        alert("يرجى إدخال اسم المعلم.");
+        return;
+    }
+
+    const exists = teachers.some(
+        teacher => teacher.name.toLowerCase() === name.toLowerCase()
+    );
+
+    if (exists) {
+        alert("اسم المعلم موجود مسبقاً.");
+        return;
+    }
+
+    teachers.push({
+        id: makeId(),
+        name: name
+    });
+
+    saveData();
+
+    input.value = "";
+
+    updateTeacherLists();
+    renderPayments();
+
+    alert("تمت إضافة المعلم بنجاح.");
+}
+
+// تحديث قوائم المعلمين
+function updateTeacherLists() {
+    const paymentSelect =
+        document.getElementById("teacherSelect");
+
+    const filterSelect =
+        document.getElementById("filterTeacher");
+
+    const selectedPayment = paymentSelect.value;
+    const selectedFilter = filterSelect.value;
+
+    paymentSelect.innerHTML =
+        '<option value="">اختر المعلم</option>';
+
+    filterSelect.innerHTML =
+        '<option value="">جميع المعلمين</option>';
+
+    teachers.forEach(teacher => {
+        const option1 = document.createElement("option");
+        option1.value = teacher.id;
+        option1.textContent = teacher.name;
+        paymentSelect.appendChild(option1);
+
+        const option2 = document.createElement("option");
+        option2.value = teacher.id;
+        option2.textContent = teacher.name;
+        filterSelect.appendChild(option2);
+    });
+
+    paymentSelect.value = selectedPayment;
+    filterSelect.value = selectedFilter;
+}
+
+// تسجيل دفعة
+function addPayment() {
+    const teacherId =
+        document.getElementById("teacherSelect").value;
+
+    const date =
+        document.getElementById("paymentDate").value;
+
+    const amount =
+        Number(document.getElementById("paymentAmount").value);
+
+    const note =
+        document.getElementById("paymentNote").value.trim();
+
+    if (!teacherId) {
+        alert("يرجى اختيار المعلم.");
+        return;
+    }
+
+    if (!date) {
+        alert("يرجى تحديد تاريخ الدفع.");
+        return;
+    }
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+        alert("يرجى إدخال قيمة دفع صحيحة أكبر من صفر.");
+        return;
+    }
+
+    payments.push({
+        id: makeId(),
+        teacherId: teacherId,
+        date: date,
+        amount: amount,
+        note: note
+    });
+
+    saveData();
+
+    document.getElementById("paymentAmount").value = "";
+    document.getElementById("paymentNote").value = "";
+
+    renderPayments();
+
+    alert("تم حفظ الدفعة بنجاح.");
+}
+
+// مسح الحقول
+function clearForm() {
+    document.getElementById("teacherSelect").value = "";
+    document.getElementById("paymentAmount").value = "";
+    document.getElementById("paymentNote").value = "";
+    document.getElementById("paymentDate").value =
+        new Date().toLocaleDateString("en-CA");
+}
+
+// عرض الدفعات وحساب الإجمالي
+function renderPayments() {
+    const teacherId =
+        document.getElementById("filterTeacher").value;
+
+    const from =
+        document.getElementById("dateFrom").value;
+
+    const to =
+        document.getElementById("dateTo").value;
+
+    const filtered = payments
+        .filter(payment => {
+            return (!teacherId || payment.teacherId === teacherId)
+                && (!from || payment.date >= from)
+                && (!to || payment.date <= to);
+        })
+        .sort((a, b) => b.date.localeCompare(a.date));
+
+    const tbody = document.getElementById("paymentsTable");
+
+    let total = 0;
+
+    tbody.innerHTML = "";
+
+    filtered.forEach((payment, index) => {
+        const teacher = teachers.find(
+            item => item.id === payment.teacherId
+        );
+
+        total += Number(payment.amount);
+
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${escapeHTML(teacher ? teacher.name : "غير معروف")}</td>
+            <td>${escapeHTML(payment.date)}</td>
+            <td class="total">${money(payment.amount)}</td>
+            <td>${escapeHTML(payment.note || "—")}</td>
+            <td class="no-print">
+                <button class="danger"
+                    onclick="deletePayment('${payment.id}')">
+                    حذف
+                </button>
+            </td>
+        `;
+
+        tbody.appendChild(row);
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6">لا توجد دفعات مسجلة لهذه الفترة.</td>
+            </tr>
+        `;
+    }
+
+    document.getElementById("totalAmount").textContent =
+        money(total);
+
+    document.getElementById("grandTotal").textContent =
+        money(total);
+
+    document.getElementById("paymentCount").textContent =
+        filtered.length;
+
+    document.getElementById("teacherCount").textContent =
+        new Set(filtered.map(p => p.teacherId)).size;
+
+    const selectedTeacher = teachers.find(
+        teacher => teacher.id === teacherId
+    );
+
+    document.getElementById("reportTitle").innerHTML = `
+        <h3>كشف الدفعات</h3>
+        <p>المعلم: ${
+            escapeHTML(selectedTeacher ? selectedTeacher.name : "جميع المعلمين")
+        }</p>
+        <p>الفترة: ${escapeHTML(from || "بداية السجلات")}
+        إلى ${escapeHTML(to || "آخر السجلات")}</p>
+    `;
+}
+
+// حذف عملية دفع
+function deletePayment(id) {
+    if (!confirm("هل تريد حذف عملية الدفع هذه؟")) {
+        return;
+    }
+
+    payments = payments.filter(
+        payment => payment.id !== id
+    );
+
+    saveData();
+    renderPayments();
+}
+
+// طباعة كشف المعلم
+function printTeacher() {
+    const teacherId =
+        document.getElementById("filterTeacher").value;
+
+    if (!teacherId) {
+        alert("يرجى اختيار معلم محدد قبل الطباعة.");
+        return;
+    }
+
+    renderPayments();
+    window.print();
+}
+
+// طباعة جميع الدفعات الظاهرة
+function printAll() {
+    renderPayments();
+    window.print();
+}
+
+// إلغاء التصفية
+function resetFilters() {
+    document.getElementById("filterTeacher").value = "";
+    document.getElementById("dateFrom").value = "";
+    document.getElementById("dateTo").value = "";
+
+    renderPayments();
+}
+
+// تاريخ اليوم الافتراضي
+document.getElementById("paymentDate").value =
+    new Date().toLocaleDateString("en-CA");
+
+// تحميل البيانات المحفوظة
+updateTeacherLists();
+renderPayments();
+
+</script>
+
+</body>
+</html>
